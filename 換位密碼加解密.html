@@ -32,7 +32,7 @@
     <h3>解密結果：</h3>
     <textarea id="decrypted" rows="4" readonly></textarea>
     
-    <script>
+    <script> 
         function transpositionCipher(text, key) {
             let keyOrder = key.split('').map(num => parseInt(num) - 1);
             let numCols = key.length;
