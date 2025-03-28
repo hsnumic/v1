@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>換位密碼加解密</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        input, textarea {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h2>換位密碼加解密</h2>
+    <label for="key">輸入密鑰（數字順序，如 312）：</label>
+    <input type="text" id="key" placeholder="輸入密鑰...">
+    <br>
+    <label for="plaintext">輸入明文：</label>
+    <textarea id="plaintext" rows="4" placeholder="輸入文字..."></textarea>
+    <br>
+    <h3>加密結果：</h3>
+    <textarea id="ciphertext" rows="4" readonly></textarea>
+    <br>
+    <h3>解密結果：</h3>
+    <textarea id="decrypted" rows="4" readonly></textarea>
+    
+    <script>
+        function transpositionCipher(text, key) {
+            let keyOrder = key.split('').map(num => parseInt(num) - 1);
+            let numCols = key.length;
+            let numRows = Math.ceil(text.length / numCols);
+            let grid = Array.from({ length: numRows }, () => Array(numCols).fill(' '));
+            
+            for (let i = 0; i < text.length; i++) {
+                let row = Math.floor(i / numCols);
+                let col = i % numCols;
+                grid[row][col] = text[i];
+            }
+            
+            let ciphertext = '';
+            for (let index of keyOrder) {
+                for (let row of grid) {
+                    ciphertext += row[index] || '';
+                }
+            }
+            return ciphertext;
+        }
+
+        function transpositionDecipher(text, key) {
+            let keyOrder = key.split('').map(num => parseInt(num) - 1);
+            let numCols = key.length;
+            let numRows = Math.ceil(text.length / numCols);
+            let grid = Array.from({ length: numRows }, () => Array(numCols).fill(''));
+            let index = 0;
+            
+            for (let col of keyOrder) {
+                for (let row = 0; row < numRows; row++) {
+                    if (index < text.length) {
+                        grid[row][col] = text[index++];
+                    }
+                }
+            }
+            
+            return grid.flat().join('').trim();
+        }
+
+        function updateCiphertext() {
+            let plaintext = document.getElementById("plaintext").value;
+            let key = document.getElementById("key").value;
+            if (/^\d+$/.test(key) && new Set(key).size === key.length) {
+                let encrypted = transpositionCipher(plaintext, key);
+                document.getElementById("ciphertext").value = encrypted;
+                document.getElementById("decrypted").value = transpositionDecipher(encrypted, key);
+            } else {
+                document.getElementById("ciphertext").value = "請輸入不重複的數字作為密鑰！";
+                document.getElementById("decrypted").value = "";
+            }
+        }
+
+        document.getElementById("plaintext").addEventListener("input", updateCiphertext);
+        document.getElementById("key").addEventListener("input", updateCiphertext);
+    </script>
+</body>
+</html>
