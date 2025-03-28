@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>凱薩密碼加密</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+        input, textarea {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h2>凱薩密碼加密</h2>
+    <label for="shift">位移量：</label>
+    <input type="number" id="shift" value="3" min="0" max="25">
+    <br>
+    <label for="plaintext">輸入明文：</label>
+    <textarea id="plaintext" rows="4" placeholder="輸入文字..."></textarea>
+    <br>
+    <h3>加密結果：</h3>
+    <textarea id="ciphertext" rows="4" readonly></textarea>
+    
+    <script>
+        function caesarCipher(text, shift) {
+            return text.split('').map(char => {
+                if (char.match(/[a-z]/i)) {
+                    let code = char.charCodeAt(0);
+                    let offset = char >= 'a' ? 97 : 65;
+                    return String.fromCharCode(((code - offset + shift) % 26) + offset);
+                }
+                return char;
+            }).join('');
+        }
+
+        function updateCiphertext() {
+            let plaintext = document.getElementById("plaintext").value;
+            let shift = parseInt(document.getElementById("shift").value) || 0;
+            document.getElementById("ciphertext").value = caesarCipher(plaintext, shift);
+        }
+
+        document.getElementById("plaintext").addEventListener("input", updateCiphertext);
+        document.getElementById("shift").addEventListener("input", updateCiphertext);
+    </script>
+</body>
+</html>
